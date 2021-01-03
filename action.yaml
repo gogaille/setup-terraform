@@ -1,0 +1,42 @@
+name: Gogaille setup terraform
+description: >
+  Setup terraform by:
+    1. Downloading required version if needed
+    2. Initializing it
+
+inputs:
+  terraform-version:
+    description: Terraform required version
+    required: true
+    default: "0.14.0"
+  workspace-key-prefix:
+    description: >
+      Path to the state file inside the S3 Bucket.
+
+      [Learn more by reading terraform documentation](https://www.terraform.io/docs/backends/types/s3.html#key)
+    default: "preproduction"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: terraform install
+      shell: bash
+      run: |
+        dpkg --compare-versions ${{ inputs.terraform-version }} eq $(terraform --version | head -n1 | cut -d'v' -f2) && exit 0
+        curl -qs https://releases.hashicorp.com/terraform/"${{ inputs.terraform-version }}"/terraform_"${{ inputs.terraform-version }}"_linux_amd64.zip | \
+          gunzip - | \
+          sudo tee /usr/local/bin/terraform > /dev/null
+        sudo chmod +x /usr/local/bin/terraform
+        terraform --version
+    - name: terraform init
+      shell: bash
+      run: |
+        terraform init \
+        -input=false \
+        -backend-config "workspace_key_prefix=${{ inputs.workspace-key-prefix }}" \
+        -reconfigure \
+        -backend=true \
+        -upgrade
+    - run: terraform get
+      shell: bash
