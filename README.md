@@ -11,6 +11,9 @@ Setup terraform by:
 ### `workspace-key-prefix`
 
 **Required** Path to the state file inside the S3 Bucket. Default `"preproduction"`.
+### `working-directory`
+
+**Required** Working directory for terraform initialization. Default `"."`.
 
 ## Example usage
 
@@ -22,4 +25,5 @@ Setup terraform by:
   with:
     terraform-version: '0.14.0'
     workspace-key-prefix: 'preproduction'
+    working-directory: 'infrastructure'
 ```

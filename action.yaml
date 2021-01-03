@@ -16,6 +16,10 @@ inputs:
       [Learn more by reading terraform documentation](https://www.terraform.io/docs/backends/types/s3.html#key)
     default: "preproduction"
     required: true
+  working-directory:
+    description: working directory
+    required: true
+    default: "."
 
 runs:
   using: "composite"
@@ -38,5 +42,7 @@ runs:
         -reconfigure \
         -backend=true \
         -upgrade
+      working-directory: ${{ inputs.working-directory }}
     - run: terraform get
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
